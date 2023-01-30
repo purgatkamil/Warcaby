@@ -32,33 +32,7 @@ void makeCheckersBackground(void){
 
 void makePawns(void){
 
-  struct WhitePawn *WP = malloc(12 * sizeof(*WP));
 
-  int counter = 0;
-
-  for(int i = 0; i < 4; ++i, ++counter){
-    WP[counter].xPosition = 2 * i;
-    WP[counter].yPosition = 0;
-    WP[counter].size = 15;
-    WP[counter].isKing = 0;
-    WP[counter].c = WHITE;
-  }
-
-  for(int i = 0; i < 4; ++i, ++counter){
-    WP[counter].xPosition = (2 * i) + 1;
-    WP[counter].yPosition = 1;
-    WP[counter].size = 15;
-    WP[counter].isKing = 0;
-    WP[counter].c = WHITE;
-  }
-
-  for(int i = 0; i < 4; ++i, ++counter){
-    WP[counter].xPosition = 2 * i;
-    WP[counter].yPosition = 2;
-    WP[counter].size = 15;
-    WP[counter].isKing = 0;
-    WP[counter].c = WHITE;
-  }
 }
 
 int main() {
@@ -66,7 +40,37 @@ int main() {
     exit(3);
   makeCheckersBackground();
 
+  struct WhitePawn *WP = malloc(15 * sizeof(*WP));
+
+  int counter = 0;
+
+  for(int i = 0; i <= 4; ++i, ++counter){
+    WP[counter].xPosition = 2 * i;
+    WP[counter].yPosition = 0;
+    WP[counter].size = 15;
+    WP[counter].isKing = 0;
+    WP[counter].c = WHITE;
+  }
+
+  for(int i = 0; i <= 4; ++i, ++counter){
+    WP[counter].xPosition = (2 * i) + 1;
+    WP[counter].yPosition = 1;
+    WP[counter].size = 15;
+    WP[counter].isKing = 0;
+    WP[counter].c = WHITE;
+  }
+
+  for(int i = 0; i <= 4; ++i, ++counter){
+    WP[counter].xPosition = 2 * i;
+    WP[counter].yPosition = 2;
+    WP[counter].size = 15;
+    WP[counter].isKing = 0;
+    WP[counter].c = WHITE;
+  }
   
+  /*for(int i = 0; i < 15; ++i){
+    printf("x:%d y:%d\n", WP[i].xPosition, WP[i].yPosition);
+  }*/
   gfx_getkey();
   return 0;
 }
