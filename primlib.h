@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 int gfx_init();
-enum color { BLACK, RED, GREEN, BLUE, CYAN, MAGENTA, YELLOW, WHITE, COLOR_MAX };
+enum color { BLACK, RED, GREEN, BLUE, CYAN, MAGENTA, YELLOW, WHITE, LIGHT_YELLOW, LIGHT_GREEN, COLOR_MAX };
 void gfx_pixel(int x, int y, enum color c);
 void gfx_line(int x1, int y1, int x2, int y2, enum color c);
 void gfx_circle(int x, int y, int r, enum color c);
