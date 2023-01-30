@@ -1,34 +1,72 @@
 #include "primlib.h"
 #include <stdlib.h>
 
-#define BEGIN_OF_BOARD_W (((gfx_screenWidth()  - 1) / 2) - 250)
-#define BEGIN_OF_BOARD_H (((gfx_screenHeight() - 1) / 2) - 250)
-#define END_OF_BOARD_W   (((gfx_screenWidth()  - 1) / 2) + 250)
-#define END_OF_BOARD_H   (((gfx_screenHeight() - 1) / 2) + 250)
+#define BOARD_SIZE 700
+#define FIELD_SIZE (BOARD_SIZE / 10)
 
+#define BEGIN_OF_BOARD_W (((gfx_screenWidth()  - 1) / 2) - (BOARD_SIZE / 2))
+#define BEGIN_OF_BOARD_H (((gfx_screenHeight() - 1) / 2) - (BOARD_SIZE / 2))
+#define END_OF_BOARD_W   (((gfx_screenWidth()  - 1) / 2) + (BOARD_SIZE / 2))
+#define END_OF_BOARD_H   (((gfx_screenHeight() - 1) / 2) + (BOARD_SIZE / 2))
+
+
+
+struct WhitePawn{
+    int xPosition;
+    int yPosition;
+    int size;
+    int isKing;
+    enum color c;
+  };
 
 void makeCheckersBackground(void){
-  gfx_filledRect(BEGIN_OF_BOARD_W, BEGIN_OF_BOARD_H, END_OF_BOARD_W, END_OF_BOARD_H, LIGHT_GREEN);  //board size is 500px x 500px
-  //gfx_filledRect(BEGIN_OF_BOARD_W + (50 * 0), BEGIN_OF_BOARD_H + (50 * 0), BEGIN_OF_BOARD_W + (50* 2), BEGIN_OF_BOARD_H + (50 * 1), LIGHT_YELLOW);
-  for(int i = 0; i < 10; i++){
-    for(int j = 0; j < 10; j++){
-      if(pow(-1, (i+j)) == 1){
-        gfx_filledRect(BEGIN_OF_BOARD_W + (i * 50), BEGIN_OF_BOARD_H + (j * 50), BEGIN_OF_BOARD_W + (i * 50) + 50, BEGIN_OF_BOARD_H + (j * 50) + 50, LIGHT_YELLOW);
-      }
+  gfx_filledRect(BEGIN_OF_BOARD_W, BEGIN_OF_BOARD_H, END_OF_BOARD_W, END_OF_BOARD_H, LIGHT_GREEN); 
+  for(int i = 0; i < 10; ++i){
+    for(int j = 0; j < 10; ++j){
+      if(pow(-1, (i+j)) == 1)   //checking color of the field
+        gfx_filledRect(BEGIN_OF_BOARD_W + (i * FIELD_SIZE), BEGIN_OF_BOARD_H + (j * FIELD_SIZE), BEGIN_OF_BOARD_W + (i * FIELD_SIZE) + FIELD_SIZE, BEGIN_OF_BOARD_H + (j * FIELD_SIZE) + FIELD_SIZE, LIGHT_YELLOW);
     }
   }
+  gfx_updateScreen();
+}
 
+void makePawns(void){
+
+  struct WhitePawn *WP = malloc(12 * sizeof(*WP));
+
+  int counter = 0;
+
+  for(int i = 0; i < 4; ++i, ++counter){
+    WP[counter].xPosition = 2 * i;
+    WP[counter].yPosition = 0;
+    WP[counter].size = 15;
+    WP[counter].isKing = 0;
+    WP[counter].c = WHITE;
+  }
+
+  for(int i = 0; i < 4; ++i, ++counter){
+    WP[counter].xPosition = (2 * i) + 1;
+    WP[counter].yPosition = 1;
+    WP[counter].size = 15;
+    WP[counter].isKing = 0;
+    WP[counter].c = WHITE;
+  }
+
+  for(int i = 0; i < 4; ++i, ++counter){
+    WP[counter].xPosition = 2 * i;
+    WP[counter].yPosition = 2;
+    WP[counter].size = 15;
+    WP[counter].isKing = 0;
+    WP[counter].c = WHITE;
+  }
 }
 
 int main() {
   if (gfx_init())
     exit(3);
   makeCheckersBackground();
-  //gfx_filledRect(BEGIN_OF_BOARD_W, BEGIN_OF_BOARD_H, END_OF_BOARD_W, END_OF_BOARD_H, LIGHT_GREEN);  //board size is 500px x 500px
-  /* clear screen */
-  //gfx_filledRect(0, 0, 500, 500, BLUE);
-  //gfx_filledCircle(gfx_screenWidth() / 2, gfx_screenHeight() / 4, 100, YELLOW);
-  gfx_updateScreen();
+
+  
   gfx_getkey();
   return 0;
 }
