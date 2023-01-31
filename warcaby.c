@@ -19,6 +19,7 @@ struct WhitePawn{
     int isKing;
     enum color outerC;
     enum color innerC;
+    int moving;
   };
 
   struct BlackPawn{
@@ -29,6 +30,7 @@ struct WhitePawn{
     int isKing;
     enum color outerC;
     enum color innerC;
+    int moving;
   };
 
   struct FieldSelection{
@@ -48,7 +50,6 @@ void makeCheckersBackground(void){
          BEGIN_OF_BOARD_W + (i * FIELD_SIZE) + FIELD_SIZE, BEGIN_OF_BOARD_H + (j * FIELD_SIZE) + FIELD_SIZE, LIGHT_YELLOW);
     }
   }
-  //gfx_updateScreen();
 }
 
 
@@ -77,6 +78,7 @@ int main() {
     WP[counter].isKing = 0;
     WP[counter].outerC = BLACK;
     WP[counter].innerC = WHITE;
+    WP[counter].moving = 0;
   }
 
   for(int i = 0; i <= 4; ++i, ++counter){
@@ -87,6 +89,7 @@ int main() {
     WP[counter].isKing = 0;
     WP[counter].outerC = BLACK;
     WP[counter].innerC = WHITE;
+    WP[counter].moving = 0;
   }
 
   for(int i = 0; i <= 4; ++i, ++counter){
@@ -97,6 +100,7 @@ int main() {
     WP[counter].isKing = 0;
     WP[counter].outerC = BLACK;
     WP[counter].innerC = WHITE;
+    WP[counter].moving = 0;
   }
 
   struct BlackPawn *BP = malloc(15 * sizeof(*BP));  //memory allocation for black pawns
@@ -112,6 +116,7 @@ int main() {
     BP[counter].isKing = 0;
     BP[counter].outerC = BLACK;
     BP[counter].innerC = BLACK;
+    BP[counter].moving = 0;
   }
 
   for(int i = 0; i <= 4; ++i, ++counter){
@@ -122,6 +127,7 @@ int main() {
     BP[counter].isKing = 0;
     BP[counter].outerC = BLACK;
     BP[counter].innerC = BLACK;
+    BP[counter].moving = 0;
   }
 
   for(int i = 0; i <= 4; ++i, ++counter){
@@ -132,8 +138,9 @@ int main() {
     BP[counter].isKing = 0;
     BP[counter].outerC = BLACK;
     BP[counter].innerC = BLACK;
+    BP[counter].moving = 0;
   }
-
+  int enterPressed = 0;
   while(1){
 
      makeCheckersBackground();
@@ -148,7 +155,8 @@ int main() {
       gfx_filledCircle((BEGIN_OF_BOARD_W + (FIELD_SIZE / 2) + (FIELD_SIZE * BP[i].xPosition)), (BEGIN_OF_BOARD_H + (FIELD_SIZE / 2) + (FIELD_SIZE * BP[i].yPosition)), BP[i].innerSize, BP[i].innerC);
     }
     
-    //int  x = gfx_pollkey();
+    
+
     switch (gfx_pollkey()){
       
       case 'w':
@@ -171,6 +179,26 @@ int main() {
           FS[0].xPosition += 1;
         break;
 
+      case '\r':
+        if(enterPressed == 0){
+          enterPressed = 1;
+          for(int i = 0; i < 15; ++i){
+            if((FS[0].xPosition == WP[i].xPosition) && FS[0].yPosition == WP[i].yPosition){
+              WP[i].moving = 1;
+            }
+          }
+        }
+        else{
+          for(int i = 0; i < 15; ++i){
+            if(WP[i].moving == 1){
+              WP[i].xPosition = FS[0].xPosition;
+              WP[i].yPosition = FS[0].yPosition;
+              WP[i].moving = 0;
+              enterPressed = 0;
+            }
+          }
+        }
+
       case -1:
         break;
 
@@ -185,11 +213,11 @@ int main() {
     gfx_rect(BEGIN_OF_BOARD_W + 1 + FIELD_SIZE * FS[0].xPosition, BEGIN_OF_BOARD_H + FIELD_SIZE * FS[0].yPosition + 1,
      BEGIN_OF_BOARD_W + FIELD_SIZE + FIELD_SIZE * FS[0].xPosition + 1, BEGIN_OF_BOARD_H + FIELD_SIZE + FIELD_SIZE * FS[0].yPosition + 1, FS[0].col);
 
-    gfx_updateScreen();
     /*for(int i = 0; i < 15; ++i){
-      printf("x:%d y:%d\n", WP[i].xPosition, WP[i].yPosition);
+        printf("Numer: %d x:%d, y:%d - FS: x:%d y:%d | moving:%d\n",i, WP[i].xPosition, WP[i].yPosition, FS[0].xPosition, FS[0].yPosition, WP[i].moving);
     }*/
 
+    gfx_updateScreen();
     SDL_Delay(60);
 }
   return 0;
