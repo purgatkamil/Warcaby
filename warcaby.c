@@ -31,26 +31,38 @@ struct WhitePawn{
     enum color innerC;
   };
 
+  struct FieldSelection{
+      int xPosition;
+      int yPosition;
+      int whoseTurn;
+      enum color col;
+  };
+
 void makeCheckersBackground(void){
+  gfx_filledRect(0, 0, gfx_screenWidth() - 1, gfx_screenHeight() - 1, BLACK);
   gfx_filledRect(BEGIN_OF_BOARD_W, BEGIN_OF_BOARD_H, END_OF_BOARD_W, END_OF_BOARD_H, LIGHT_GREEN); 
   for(int i = 0; i < 10; ++i){
     for(int j = 0; j < 10; ++j){
       if(pow(-1, (i+j)) == 1)   //checking color of the field
-        gfx_filledRect(BEGIN_OF_BOARD_W + (i * FIELD_SIZE), BEGIN_OF_BOARD_H + (j * FIELD_SIZE), BEGIN_OF_BOARD_W + (i * FIELD_SIZE) + FIELD_SIZE, BEGIN_OF_BOARD_H + (j * FIELD_SIZE) + FIELD_SIZE, LIGHT_YELLOW);
+        gfx_filledRect(BEGIN_OF_BOARD_W + (i * FIELD_SIZE), BEGIN_OF_BOARD_H + (j * FIELD_SIZE),
+         BEGIN_OF_BOARD_W + (i * FIELD_SIZE) + FIELD_SIZE, BEGIN_OF_BOARD_H + (j * FIELD_SIZE) + FIELD_SIZE, LIGHT_YELLOW);
     }
   }
   //gfx_updateScreen();
 }
 
-void makePawns(void){
-
-
-}
 
 int main() {
   if (gfx_init())
     exit(3);
-  makeCheckersBackground();
+
+  struct FieldSelection *FS = malloc(sizeof(*FS));
+  FS[0].xPosition = 3;
+  FS[0].yPosition = 0;
+  FS[0].whoseTurn = 1;
+  FS[0].col = RED;
+
+
 
   struct WhitePawn *WP = malloc(15 * sizeof(*WP));  //memory allocation for white pawns
 
@@ -122,19 +134,63 @@ int main() {
     BP[counter].innerC = BLACK;
   }
 
-  //Drawing pawns in starting positions
-  for(int i = 0; i < 15; ++i){
-    gfx_filledCircle((BEGIN_OF_BOARD_W + (FIELD_SIZE / 2) + (FIELD_SIZE * WP[i].xPosition)), (BEGIN_OF_BOARD_H + (FIELD_SIZE / 2) + (FIELD_SIZE * WP[i].yPosition)), WP[i].outerSize, WP[i].outerC);
-    gfx_filledCircle((BEGIN_OF_BOARD_W + (FIELD_SIZE / 2) + (FIELD_SIZE * WP[i].xPosition)), (BEGIN_OF_BOARD_H + (FIELD_SIZE / 2) + (FIELD_SIZE * WP[i].yPosition)), WP[i].innerSize, WP[i].innerC);
-  }
-  for(int i = 0; i < 15; ++i){
-    gfx_filledCircle((BEGIN_OF_BOARD_W + (FIELD_SIZE / 2) + (FIELD_SIZE * BP[i].xPosition)), (BEGIN_OF_BOARD_H + (FIELD_SIZE / 2) + (FIELD_SIZE * BP[i].yPosition)), BP[i].outerSize, BP[i].outerC);
-    gfx_filledCircle((BEGIN_OF_BOARD_W + (FIELD_SIZE / 2) + (FIELD_SIZE * BP[i].xPosition)), (BEGIN_OF_BOARD_H + (FIELD_SIZE / 2) + (FIELD_SIZE * BP[i].yPosition)), BP[i].innerSize, BP[i].innerC);
-  }
-  gfx_updateScreen();
-  /*for(int i = 0; i < 15; ++i){
-    printf("x:%d y:%d\n", WP[i].xPosition, WP[i].yPosition);
-  }*/
-  gfx_getkey();
+  while(1){
+
+     makeCheckersBackground();
+
+    //Drawing pawns in starting positions
+    for(int i = 0; i < 15; ++i){
+      gfx_filledCircle((BEGIN_OF_BOARD_W + (FIELD_SIZE / 2) + (FIELD_SIZE * WP[i].xPosition)), (BEGIN_OF_BOARD_H + (FIELD_SIZE / 2) + (FIELD_SIZE * WP[i].yPosition)), WP[i].outerSize, WP[i].outerC);
+      gfx_filledCircle((BEGIN_OF_BOARD_W + (FIELD_SIZE / 2) + (FIELD_SIZE * WP[i].xPosition)), (BEGIN_OF_BOARD_H + (FIELD_SIZE / 2) + (FIELD_SIZE * WP[i].yPosition)), WP[i].innerSize, WP[i].innerC);
+    }
+    for(int i = 0; i < 15; ++i){
+      gfx_filledCircle((BEGIN_OF_BOARD_W + (FIELD_SIZE / 2) + (FIELD_SIZE * BP[i].xPosition)), (BEGIN_OF_BOARD_H + (FIELD_SIZE / 2) + (FIELD_SIZE * BP[i].yPosition)), BP[i].outerSize, BP[i].outerC);
+      gfx_filledCircle((BEGIN_OF_BOARD_W + (FIELD_SIZE / 2) + (FIELD_SIZE * BP[i].xPosition)), (BEGIN_OF_BOARD_H + (FIELD_SIZE / 2) + (FIELD_SIZE * BP[i].yPosition)), BP[i].innerSize, BP[i].innerC);
+    }
+    
+    //int  x = gfx_pollkey();
+    switch (gfx_pollkey()){
+      
+      case 'w':
+        if(FS[0].yPosition > 0)
+          FS[0].yPosition -= 1;
+        break;
+
+      case 's':
+        if(FS[0].yPosition < 9)
+          FS[0].yPosition += 1;
+        break;
+
+      case 'a':
+        if(FS[0].xPosition > 0) 
+          FS[0].xPosition -= 1;
+        break;
+
+      case 'd':
+        if(FS[0].xPosition < 9)
+          FS[0].xPosition += 1;
+        break;
+
+      case -1:
+        break;
+
+    }
+
+    gfx_rect(BEGIN_OF_BOARD_W + FIELD_SIZE * FS[0].xPosition, BEGIN_OF_BOARD_H + FIELD_SIZE * FS[0].yPosition,
+     BEGIN_OF_BOARD_W + FIELD_SIZE + FIELD_SIZE * FS[0].xPosition, BEGIN_OF_BOARD_H + FIELD_SIZE + FIELD_SIZE * FS[0].yPosition, FS[0].col);
+
+    gfx_rect(BEGIN_OF_BOARD_W - 1 + FIELD_SIZE * FS[0].xPosition, BEGIN_OF_BOARD_H + FIELD_SIZE * FS[0].yPosition - 1,
+     BEGIN_OF_BOARD_W + FIELD_SIZE + FIELD_SIZE * FS[0].xPosition - 1, BEGIN_OF_BOARD_H + FIELD_SIZE + FIELD_SIZE * FS[0].yPosition - 1, FS[0].col);
+
+    gfx_rect(BEGIN_OF_BOARD_W + 1 + FIELD_SIZE * FS[0].xPosition, BEGIN_OF_BOARD_H + FIELD_SIZE * FS[0].yPosition + 1,
+     BEGIN_OF_BOARD_W + FIELD_SIZE + FIELD_SIZE * FS[0].xPosition + 1, BEGIN_OF_BOARD_H + FIELD_SIZE + FIELD_SIZE * FS[0].yPosition + 1, FS[0].col);
+
+    gfx_updateScreen();
+    /*for(int i = 0; i < 15; ++i){
+      printf("x:%d y:%d\n", WP[i].xPosition, WP[i].yPosition);
+    }*/
+
+    SDL_Delay(60);
+}
   return 0;
 }
