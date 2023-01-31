@@ -141,6 +141,7 @@ int main() {
     BP[counter].moving = 0;
   }
   int enterPressed = 0;
+  int turn = 0;
   while(1){
 
      makeCheckersBackground();
@@ -180,25 +181,52 @@ int main() {
         break;
 
       case '\r':
+
         if(enterPressed == 0){
-          enterPressed = 1;
-          for(int i = 0; i < 15; ++i){
-            if((FS[0].xPosition == WP[i].xPosition) && FS[0].yPosition == WP[i].yPosition){
-              WP[i].moving = 1;
+          if(turn == 0){
+            for(int i = 0; i < 15; ++i){
+              if((FS[0].xPosition == WP[i].xPosition) && FS[0].yPosition == WP[i].yPosition){
+                WP[i].moving = 1;
+                enterPressed = 1;
+              }
             }
+          }
+          else{
+            for(int i = 0; i < 15; ++i){
+              if((FS[0].xPosition == BP[i].xPosition) && FS[0].yPosition == BP[i].yPosition){
+                BP[i].moving = 1;
+                enterPressed = 1;
+              }
+            }            
           }
         }
         else{
-          for(int i = 0; i < 15; ++i){
-            if(WP[i].moving == 1){
-              WP[i].xPosition = FS[0].xPosition;
-              WP[i].yPosition = FS[0].yPosition;
-              WP[i].moving = 0;
-              enterPressed = 0;
+          if(turn == 0){
+            for(int i = 0; i < 15; ++i){
+              if(WP[i].moving == 1){
+                WP[i].xPosition = FS[0].xPosition;
+                WP[i].yPosition = FS[0].yPosition;
+                WP[i].moving = 0;
+                enterPressed = 0;
+                turn = 1;
+              }
             }
           }
+          else{
+            for(int i = 0; i < 15; ++i){
+              if(BP[i].moving == 1){
+                BP[i].xPosition = FS[0].xPosition;
+                BP[i].yPosition = FS[0].yPosition;
+                BP[i].moving = 0;
+                enterPressed = 0;
+                turn = 0;
+              }
+            }            
+          }
         }
+        break;
 
+        
       case -1:
         break;
 
@@ -216,6 +244,9 @@ int main() {
     /*for(int i = 0; i < 15; ++i){
         printf("Numer: %d x:%d, y:%d - FS: x:%d y:%d | moving:%d\n",i, WP[i].xPosition, WP[i].yPosition, FS[0].xPosition, FS[0].yPosition, WP[i].moving);
     }*/
+    for(int i = 0; i < 15; ++i){
+        printf("Numer: %d x:%d, y:%d - FS: x:%d y:%d | moving:%d\n",i, BP[i].xPosition, BP[i].yPosition, FS[0].xPosition, FS[0].yPosition, BP[i].moving);
+    }
 
     gfx_updateScreen();
     SDL_Delay(60);
