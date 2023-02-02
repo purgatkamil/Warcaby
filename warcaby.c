@@ -9,8 +9,6 @@
 #define END_OF_BOARD_W   (((gfx_screenWidth()  - 1) / 2) + (BOARD_SIZE / 2))
 #define END_OF_BOARD_H   (((gfx_screenHeight() - 1) / 2) + (BOARD_SIZE / 2))
 
-
-
 struct WhitePawn{
     int xPosition;
     int yPosition;
@@ -40,6 +38,16 @@ struct WhitePawn{
       enum color col;
   };
 
+int isFieldEmpty(struct WhitePawn **WP, struct BlackPawn **BP){
+  for(int i = 0; i < 15; ++i){
+    /*if((WP[i]->xPosition == FSPtr) && (WP[i]->yPosition == y))
+      return 1;
+    if((BP[i]->xPosition == x) && (WP[i]->yPosition == y))
+      return 2;*/
+  }
+  return 0;
+}
+
 void makeCheckersBackground(void){
   gfx_filledRect(0, 0, gfx_screenWidth() - 1, gfx_screenHeight() - 1, BLACK);
   gfx_filledRect(BEGIN_OF_BOARD_W, BEGIN_OF_BOARD_H, END_OF_BOARD_W, END_OF_BOARD_H, LIGHT_GREEN); 
@@ -53,21 +61,25 @@ void makeCheckersBackground(void){
 }
 
 int WhiteLegalityCheck(struct WhitePawn *pawn, struct FieldSelection *select){
-  if((abs(pawn->xPosition - select->xPosition) != 1) || (abs(pawn->yPosition - select->yPosition) != 1)){
+  if((abs(pawn->xPosition - select->xPosition) != 1) || (abs(pawn->yPosition - select->yPosition) != 1))
     return 0;
-  }
+  if((isFieldEmpty(&WP, &BP)) == 1)
+    return 0;
+
 
 
   return 1;
 }
 
-int BlackLegalityCheck(struct BlackPawn * pawn, struct FieldSelection *select){
-    if((abs(pawn->xPosition - select->xPosition) != 1) || (abs(pawn->yPosition - select->yPosition) != 1)){
-    return 0;
-  }
+int BlackLegalityCheck(struct BlackPawn *pawn, struct FieldSelection *select){
+    if((abs(pawn->xPosition - select->xPosition) != 1) || (abs(pawn->yPosition - select->yPosition) != 1))
+      return 0;
+    //if((isFieldEmpty(FS[0].xPosition, FS[0].yPosition)) == 2)
+     // return 0;  
 
   return 1;
 }
+
 
 
 int main() {
@@ -77,12 +89,11 @@ int main() {
   //int WhitePawnsCounter = 15;
   //int BlackPawnsCounter = 15;
 
-  struct FieldSelection *FS = malloc(sizeof(*FS));
+struct FieldSelection *FS = malloc(sizeof(*FS));
   FS[0].xPosition = 3;
   FS[0].yPosition = 0;
   FS[0].whoseTurn = 1;
   FS[0].col = RED;
-
 
 
   struct WhitePawn **WP = malloc(15 * sizeof(struct WhitePawn)); 
@@ -293,3 +304,5 @@ int main() {
 }
   return 0;
 }
+
+
