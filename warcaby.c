@@ -9,6 +9,9 @@
 #define END_OF_BOARD_W   (((gfx_screenWidth()  - 1) / 2) + (BOARD_SIZE / 2))
 #define END_OF_BOARD_H   (((gfx_screenHeight() - 1) / 2) + (BOARD_SIZE / 2))
 
+int WhitePawnsCounter = 15;
+int BlackPawnsCounter = 15;
+
 struct WhitePawn{
     int xPosition;
     int yPosition;
@@ -42,8 +45,6 @@ int isFieldEmpty(struct FieldSelection *select, struct WhitePawn WPtab[], struct
   for(int i = 0; i < 15; ++i){
     if((WPtab[i].xPosition == select->xPosition) && (WPtab[i].yPosition == select->yPosition))
       return 1;
-  }
-  for(int i = 0; i < 15; ++i){
     if((BPtab[i].xPosition == select->xPosition) && (BPtab[i].yPosition == select->yPosition))
       return 2;
   }
@@ -51,7 +52,7 @@ int isFieldEmpty(struct FieldSelection *select, struct WhitePawn WPtab[], struct
 }
 
 void makeCheckersBackground(void){
-  gfx_filledRect(0, 0, gfx_screenWidth() - 1, gfx_screenHeight() - 1, BLACK);
+  gfx_filledRect(0, 0, gfx_screenWidth() - 1, gfx_screenHeight() - 1, BLUE);
   gfx_filledRect(BEGIN_OF_BOARD_W, BEGIN_OF_BOARD_H, END_OF_BOARD_W, END_OF_BOARD_H, LIGHT_GREEN); 
   for(int i = 0; i < 10; ++i){
     for(int j = 0; j < 10; ++j){
@@ -65,8 +66,31 @@ void makeCheckersBackground(void){
 int WhiteLegalityCheck(struct WhitePawn *pawn, struct FieldSelection *select,struct WhitePawn WPtab[], struct BlackPawn BPtab[]){
   if((abs(pawn->xPosition - select->xPosition) != 1) || (abs(pawn->yPosition - select->yPosition) != 1))
     return 0;
-  if((isFieldEmpty(select, WPtab, BPtab)) == 1)
+  if(isFieldEmpty(select, WPtab, BPtab) == 1){
     return 0;
+  }
+ else if(isFieldEmpty(select, WPtab, BPtab) == 2){
+    for(int i = 0; i < 15; ++i){
+      if((select->xPosition == BPtab[i].xPosition) && (select->yPosition == BPtab[i].yPosition)){
+        if(BlackPawnsCounter > 10){
+           BPtab[i].xPosition = 10;
+           BPtab[i].yPosition = 15 - BlackPawnsCounter; 
+        }
+        else if(BlackPawnsCounter > 5){
+           BPtab[i].xPosition = 11;
+           BPtab[i].yPosition = 10 - BlackPawnsCounter;
+        }
+        else{
+           BPtab[i].xPosition = 12;
+           BPtab[i].yPosition = 5 - BlackPawnsCounter;
+        }
+        --BlackPawnsCounter;
+      }
+    }
+
+    return 1; 
+  }
+
 
 
 
@@ -76,8 +100,29 @@ int WhiteLegalityCheck(struct WhitePawn *pawn, struct FieldSelection *select,str
 int BlackLegalityCheck(struct BlackPawn *pawn, struct FieldSelection *select,struct WhitePawn WPtab[], struct BlackPawn BPtab[]){
     if((abs(pawn->xPosition - select->xPosition) != 1) || (abs(pawn->yPosition - select->yPosition) != 1))
       return 0;
-    if((isFieldEmpty(select, WPtab, BPtab)) == 2)
-      return 0;  
+  if(isFieldEmpty(select, WPtab, BPtab) == 2){
+    return 0;
+  }
+ else if(isFieldEmpty(select, WPtab, BPtab) == 1){
+    for(int i = 0; i < 15; ++i){
+      if((select->xPosition == WPtab[i].xPosition) && (select->yPosition == WPtab[i].yPosition)){
+        if(WhitePawnsCounter > 10){
+           WPtab[i].xPosition = -1;
+           WPtab[i].yPosition = -6 + WhitePawnsCounter;
+        }
+        else if(WhitePawnsCounter > 5){
+           WPtab[i].xPosition = -2;
+           WPtab[i].yPosition = -1 + WhitePawnsCounter;
+        }
+        else{
+           WPtab[i].xPosition = -3;
+           WPtab[i].yPosition = 4 + WhitePawnsCounter;
+        }
+        --WhitePawnsCounter;
+      }
+    }
+    return 1; 
+  }
 
   return 1;
 }
@@ -87,8 +132,7 @@ int main() {
   if (gfx_init())
     exit(3);
 
-  //int WhitePawnsCounter = 15;
-  //int BlackPawnsCounter = 15;
+
 
   struct FieldSelection FS;
   FS.xPosition = 3;
@@ -101,6 +145,7 @@ int main() {
 
   int counter = 0;
 
+  //Creating structs objects that are representing white pawns
   for(int i = 0; i <= 4; ++i, ++counter){
     WP[counter].xPosition = ((2 * i) + 1);
     WP[counter].yPosition = 0;
