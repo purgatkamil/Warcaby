@@ -38,12 +38,14 @@ struct WhitePawn{
       enum color col;
   };
 
-int isFieldEmpty(struct WhitePawn **WP, struct BlackPawn **BP){
+int isFieldEmpty(struct FieldSelection *select, struct WhitePawn WPtab[], struct BlackPawn BPtab[]){
   for(int i = 0; i < 15; ++i){
-    /*if((WP[i].xPosition == FSPtr) && (WP[i].yPosition == y))
+    if((WPtab[i].xPosition == select->xPosition) && (WPtab[i].yPosition == select->yPosition))
       return 1;
-    if((BP[i].xPosition == x) && (WP[i].yPosition == y))
-      return 2;*/
+  }
+  for(int i = 0; i < 15; ++i){
+    if((BPtab[i].xPosition == select->xPosition) && (BPtab[i].yPosition == select->yPosition))
+      return 2;
   }
   return 0;
 }
@@ -60,26 +62,25 @@ void makeCheckersBackground(void){
   }
 }
 
-int WhiteLegalityCheck(struct WhitePawn *pawn, struct FieldSelection *select){
+int WhiteLegalityCheck(struct WhitePawn *pawn, struct FieldSelection *select,struct WhitePawn WPtab[], struct BlackPawn BPtab[]){
   if((abs(pawn->xPosition - select->xPosition) != 1) || (abs(pawn->yPosition - select->yPosition) != 1))
     return 0;
-  //if((isFieldEmpty(&WP, &BP)) == 1)
-  //  return 0;
+  if((isFieldEmpty(select, WPtab, BPtab)) == 1)
+    return 0;
 
 
 
   return 1;
 }
 
-int BlackLegalityCheck(struct BlackPawn *pawn, struct FieldSelection *select){
+int BlackLegalityCheck(struct BlackPawn *pawn, struct FieldSelection *select,struct WhitePawn WPtab[], struct BlackPawn BPtab[]){
     if((abs(pawn->xPosition - select->xPosition) != 1) || (abs(pawn->yPosition - select->yPosition) != 1))
       return 0;
-    //if((isFieldEmpty(FS.xPosition, FS.yPosition)) == 2)
-     // return 0;  
+    if((isFieldEmpty(select, WPtab, BPtab)) == 2)
+      return 0;  
 
   return 1;
 }
-
 
 
 int main() {
@@ -89,12 +90,11 @@ int main() {
   //int WhitePawnsCounter = 15;
   //int BlackPawnsCounter = 15;
 
-struct FieldSelection FS;
+  struct FieldSelection FS;
   FS.xPosition = 3;
   FS.yPosition = 0;
   FS.whoseTurn = 1;
   FS.col = RED;
-
 
 
   struct WhitePawn WP[15];
@@ -235,7 +235,7 @@ struct FieldSelection FS;
           if(turn == 0){
             for(int i = 0; i < 15; ++i){
               if(WP[i].moving == 1){
-                if(WhiteLegalityCheck(&(WP[i]), &(FS))){
+                if(WhiteLegalityCheck(&(WP[i]), &(FS), WP, BP)){
                   WP[i].xPosition = FS.xPosition;
                   WP[i].yPosition = FS.yPosition;
                   WP[i].moving = 0;
@@ -252,7 +252,7 @@ struct FieldSelection FS;
           else{
             for(int i = 0; i < 15; ++i){
               if(BP[i].moving == 1){
-                if(BlackLegalityCheck(&(BP[i]), &(FS))){
+                if(BlackLegalityCheck(&(BP[i]), &(FS), WP, BP)){
                   BP[i].xPosition = FS.xPosition;
                   BP[i].yPosition = FS.yPosition;
                   BP[i].moving = 0;
