@@ -85,7 +85,6 @@ int WhiteLegalityCheck(struct WhitePawn *pawn, struct FieldSelection *select,str
           BPtab[i].yPosition = 5 - BlackPawnsCounter;
         }
         --BlackPawnsCounter;
-
       }
     }
     return 1; 
@@ -106,18 +105,18 @@ int BlackLegalityCheck(struct BlackPawn *pawn, struct FieldSelection *select,str
   else if(isFieldEmpty(select->xPosition, select->yPosition, WPtab, BPtab) == 1){
     for(int i = 0; i < 15; ++i){
       if((select->xPosition == WPtab[i].xPosition) && (select->yPosition == WPtab[i].yPosition)){
-        if(WhitePawnsCounter > 10){
-           WPtab[i].xPosition = -1;
-           WPtab[i].yPosition = -6 + WhitePawnsCounter;
-        }
-        else if(WhitePawnsCounter > 5){
-           WPtab[i].xPosition = -2;
-           WPtab[i].yPosition = -1 + WhitePawnsCounter;
-        }
-        else{
-           WPtab[i].xPosition = -3;
-           WPtab[i].yPosition = 4 + WhitePawnsCounter;
-        }
+          if(WhitePawnsCounter > 10){
+             WPtab[i].xPosition = -1;
+             WPtab[i].yPosition = -6 + WhitePawnsCounter;
+          }
+          else if(WhitePawnsCounter > 5){
+             WPtab[i].xPosition = -2;
+             WPtab[i].yPosition = -1 + WhitePawnsCounter;
+          }
+          else{
+             WPtab[i].xPosition = -3;
+             WPtab[i].yPosition = 4 + WhitePawnsCounter;
+          }            
         --WhitePawnsCounter;
       }
     }
@@ -127,11 +126,33 @@ int BlackLegalityCheck(struct BlackPawn *pawn, struct FieldSelection *select,str
 }
 
 
+void BoardUpdate(int (*Board)[10], struct WhitePawn WPtab[], struct BlackPawn BPtab[]){
+  for(int i = 0; i < 10; ++i){
+    for(int j = 0; j < 10; ++j){
+      Board[i][j] = 0;
+    }
+  }
+  for(int i = 0; i < 15; ++i){
+    int xW = WPtab[i].xPosition;
+    int yW = WPtab[i].yPosition;
+    int xB = BPtab[i].xPosition;
+    int yB = BPtab[i].yPosition;
+    Board[xW][yW] = 1;
+    Board[xB][yB] = 2;
+  }
+  /*printf("______________________________\n");
+    for(int j = 0; j < 10; ++j){
+      for(int i = 0; i < 10; ++i){
+        printf(" %d ", Board[i][j]);
+      }
+     printf("\n");
+    }  
+  printf("______________________________\n");*/
+}
+
 int main() {
   if (gfx_init())
     exit(3);
-
-
 
   struct FieldSelection FS;
   FS.xPosition = 3;
@@ -215,8 +236,12 @@ int main() {
     BP[counter].innerC = BLACK;
     BP[counter].moving = 0;
   }
+  int BoardMatrix[10][10];
+  BoardUpdate(BoardMatrix, WP, BP);
+
   int enterPressed = 0;
   int turn = 0;
+
   while(1){
 
      makeCheckersBackground();
@@ -285,6 +310,7 @@ int main() {
                   WP[i].moving = 0;
                   enterPressed = 0;
                   turn = 1;
+                  BoardUpdate(BoardMatrix, WP, BP);
                 }
                 else{
                   enterPressed = 0;
@@ -302,6 +328,7 @@ int main() {
                   BP[i].moving = 0;
                   enterPressed = 0;
                   turn = 0;
+                  BoardUpdate(BoardMatrix, WP, BP);
                 }
                 else{
                   enterPressed = 0;
@@ -338,6 +365,8 @@ int main() {
      //  printf("Numer: %d x:%d, y:%d - FS: x:%d y:%d | moving:%d\n",i, BP[i].xPosition, BP[i].yPosition, FS.xPosition, FS.yPosition, BP[i].moving);
     //}
 
+
+    
     gfx_updateScreen();
     SDL_Delay(60);
 }
