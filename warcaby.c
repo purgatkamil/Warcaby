@@ -63,64 +63,75 @@ void makeCheckersBackground(void){
   }
 }
 
-
-
-int WhiteLegalityCheck(struct WhitePawn *pawn, struct FieldSelection *select, struct WhitePawn WPtab[], struct BlackPawn BPtab[], int (*Board)[10]){
-  int LegalMoves[4][3] = {{-1,-1, 0},{-1,-1, 0},{-1,-1, 0},{-1,-1, 0}}; // {xPosition, yPosition, Capture?}
+int (*FindLegalMoves_White(int xPosition, int yPosition, int (*Board)[10]))[3]{
+  static int LegalMovesW[4][3] = {{-1, -1, 0},{-1, -1, 0},{-1, -1, 0},{-1, -1, 0}};
   int LegalMovesCounter = 0;
 
-  if(Board[(pawn->xPosition) + 1][(pawn->yPosition) + 1] == 0){
-    LegalMoves[LegalMovesCounter][0] = (pawn->xPosition) + 1;
-    LegalMoves[LegalMovesCounter][1] = (pawn->yPosition) + 1;
-    ++LegalMovesCounter;
-  }
-  else if(Board[(pawn->xPosition) + 1][(pawn->yPosition) + 1] == 2){
-    if(Board[(pawn->xPosition) + 2][(pawn->yPosition) + 2] == 0){
-      LegalMoves[LegalMovesCounter][0] = (pawn->xPosition) + 2;
-      LegalMoves[LegalMovesCounter][1] = (pawn->yPosition) + 2;
-      LegalMoves[LegalMovesCounter][2] = 1;
-      ++LegalMovesCounter;  
-    }
-  }
-
-  if(Board[(pawn->xPosition) - 1][(pawn->yPosition) + 1] == 0){
-    LegalMoves[LegalMovesCounter][0] = (pawn->xPosition) - 1;
-    LegalMoves[LegalMovesCounter][1] = (pawn->yPosition) + 1;
-    ++LegalMovesCounter;
-  }
-  else if(Board[(pawn->xPosition) - 1][(pawn->yPosition) + 1] == 2){
-    if(Board[(pawn->xPosition) - 2][(pawn->yPosition) + 2] == 0){
-      LegalMoves[LegalMovesCounter][0] = (pawn->xPosition) - 2;
-      LegalMoves[LegalMovesCounter][1] = (pawn->yPosition) + 2;
-      LegalMoves[LegalMovesCounter][2] = 1;
-      ++LegalMovesCounter;      
-    }
-  }
-
-  if(Board[(pawn->xPosition) + 1][(pawn->yPosition) - 1] == 2){
-    if(Board[(pawn->xPosition) + 2][(pawn->yPosition) - 2] == 0){
-      LegalMoves[LegalMovesCounter][0] = (pawn->xPosition) - 2;
-      LegalMoves[LegalMovesCounter][1] = (pawn->yPosition) + 2;
-      LegalMoves[LegalMovesCounter][2] = 1;
+    if(Board[(xPosition) + 1][(yPosition) + 1] == 0){
+      LegalMovesW[LegalMovesCounter][0] = (xPosition) + 1;
+      LegalMovesW[LegalMovesCounter][1] = (yPosition) + 1;
       ++LegalMovesCounter;
     }
-  }
+    else if(Board[(xPosition) + 1][(yPosition) + 1] == 2){
+      if(Board[(xPosition) + 2][(yPosition) + 2] == 0){
+        LegalMovesW[LegalMovesCounter][0] = (xPosition) + 2;
+        LegalMovesW[LegalMovesCounter][1] = (yPosition) + 2;
+        LegalMovesW[LegalMovesCounter][2] = 1;
+        ++LegalMovesCounter;  
+      }
+    }
 
-  if(Board[(pawn->xPosition) - 1][(pawn->yPosition) - 1] == 2){
-    if(Board[(pawn->xPosition) - 2][(pawn->yPosition) - 2] == 0){
-      LegalMoves[LegalMovesCounter][0] = (pawn->xPosition) - 2;
-      LegalMoves[LegalMovesCounter][1] = (pawn->yPosition) + 2;
-      LegalMoves[LegalMovesCounter][2] = 1;
+    if(Board[(xPosition) - 1][(yPosition) + 1] == 0){
+      LegalMovesW[LegalMovesCounter][0] = (xPosition) - 1;
+      LegalMovesW[LegalMovesCounter][1] = (yPosition) + 1;
       ++LegalMovesCounter;
     }
+    else if(Board[(xPosition) - 1][(yPosition) + 1] == 2){
+      if(Board[(xPosition) - 2][(yPosition) + 2] == 0){
+        LegalMovesW[LegalMovesCounter][0] = (xPosition) - 2;
+        LegalMovesW[LegalMovesCounter][1] = (yPosition) + 2;
+        LegalMovesW[LegalMovesCounter][2] = 1;
+        ++LegalMovesCounter;      
+      }
+    }
+
+    if(Board[(xPosition) + 1][(yPosition) - 1] == 2){
+      if(Board[(xPosition) + 2][(yPosition) - 2] == 0){
+        LegalMovesW[LegalMovesCounter][0] = (xPosition) - 2;
+        LegalMovesW[LegalMovesCounter][1] = (yPosition) + 2;
+        LegalMovesW[LegalMovesCounter][2] = 1;
+        ++LegalMovesCounter;
+      }
+    }
+
+    if(Board[(xPosition) - 1][(yPosition) - 1] == 2){
+      if(Board[(xPosition) - 2][(yPosition) - 2] == 0){
+        LegalMovesW[LegalMovesCounter][0] = (xPosition) - 2;
+        LegalMovesW[LegalMovesCounter][1] = (yPosition) + 2;
+        LegalMovesW[LegalMovesCounter][2] = 1;
+        ++LegalMovesCounter;
+      }
+    }
+  return LegalMovesW;
+}
+
+int WhiteLegalityCheck(struct WhitePawn *pawn, struct FieldSelection *select, struct WhitePawn WPtab[], struct BlackPawn BPtab[], int (*Board)[10]){
+  int (*LegalMoves)[3] = FindLegalMoves_White(pawn->xPosition, pawn->yPosition, Board);
+  for(int i = 0; i < 4; ++i){
+    printf("%d,%d,%d\n", LegalMoves[i][0], LegalMoves[i][1], LegalMoves[i][2]);
   }
 
   for(int i = 0; i < 4; ++i){
     if((LegalMoves[i][0] == select->xPosition) && (LegalMoves[i][1] == select->yPosition)){
+      int X = LegalMoves[i][0];
+      int Y = LegalMoves[i][1];
       if(LegalMoves[i][2] == 1){
         for(int i = 0; i < 15; ++i){
-          int averageX = (LegalMoves[i][0] + pawn->xPosition) / 2;
-          int averageY = (LegalMoves[i][1] + pawn->yPosition) / 2;
+          int averageX = 0;
+          int averageY = 0;
+          averageX = (X + pawn->xPosition) / 2;
+          averageY = (Y + pawn->yPosition) / 2;
+          printf("SrednieX:%d, SrednieY:%d, BPx:%d, BPy:%d\n", averageX, averageY, BPtab[i].xPosition, BPtab[i].yPosition);
           if((averageX == BPtab[i].xPosition) && (averageY == BPtab[i].yPosition)){
             if(BlackPawnsCounter > 10){
               BPtab[i].xPosition = 10;
@@ -150,67 +161,76 @@ int WhiteLegalityCheck(struct WhitePawn *pawn, struct FieldSelection *select, st
   return 0;
 }
 
-int BlackLegalityCheck(struct BlackPawn *pawn, struct FieldSelection *select, struct WhitePawn WPtab[], struct BlackPawn BPtab[], int (*Board)[10]){
-  int LegalMoves[4][3] = {{-1,-1, 0},{-1,-1, 0},{-1,-1, 0},{-1,-1, 0}}; // {xPosition, yPosition, Capture?}
+int (*FindLegalMoves_Black(int xPosition, int yPosition, int (*Board)[10]))[3]{
+  static int LegalMovesB[4][3] = {{-1, -1, 0},{-1, -1, 0},{-1, -1, 0},{-1, -1, 0}};
   int LegalMovesCounter = 0;
 
-  if(Board[(pawn->xPosition) - 1][(pawn->yPosition) - 1] == 0){
-    LegalMoves[LegalMovesCounter][0] = (pawn->xPosition) - 1;
-    LegalMoves[LegalMovesCounter][1] = (pawn->yPosition) - 1;
+  if(Board[(xPosition) - 1][(yPosition) - 1] == 0){
+    LegalMovesB[LegalMovesCounter][0] = (xPosition) - 1;
+    LegalMovesB[LegalMovesCounter][1] = (yPosition) - 1;
     ++LegalMovesCounter;
   }
-  else if(Board[(pawn->xPosition) - 1][(pawn->yPosition) - 1] == 1){
-    if(Board[(pawn->xPosition) - 2][(pawn->yPosition) - 2] == 0){
-      LegalMoves[LegalMovesCounter][0] = (pawn->xPosition) - 2;
-      LegalMoves[LegalMovesCounter][1] = (pawn->yPosition) - 2;
-      LegalMoves[LegalMovesCounter][2] = 1;
+  else if(Board[(xPosition) - 1][(yPosition) - 1] == 1){
+    if(Board[(xPosition) - 2][(yPosition) - 2] == 0){
+      LegalMovesB[LegalMovesCounter][0] = (xPosition) - 2;
+      LegalMovesB[LegalMovesCounter][1] = (yPosition) - 2;
+      LegalMovesB[LegalMovesCounter][2] = 1;
       ++LegalMovesCounter;  
     }
   }
 
-  if(Board[(pawn->xPosition) + 1][(pawn->yPosition) - 1] == 0){
-    LegalMoves[LegalMovesCounter][0] = (pawn->xPosition) + 1;
-    LegalMoves[LegalMovesCounter][1] = (pawn->yPosition) - 1;
+  if(Board[(xPosition) + 1][(yPosition) - 1] == 0){
+    LegalMovesB[LegalMovesCounter][0] = (xPosition) + 1;
+    LegalMovesB[LegalMovesCounter][1] = (yPosition) - 1;
     ++LegalMovesCounter;
   }
-  else if(Board[(pawn->xPosition) + 1][(pawn->yPosition) - 1] == 1){
-    if(Board[(pawn->xPosition) + 2][(pawn->yPosition) - 2] == 0){
-      LegalMoves[LegalMovesCounter][0] = (pawn->xPosition) + 2;
-      LegalMoves[LegalMovesCounter][1] = (pawn->yPosition) - 2;
-      LegalMoves[LegalMovesCounter][2] = 1;
+  else if(Board[(xPosition) + 1][(yPosition) - 1] == 1){
+    if(Board[(xPosition) + 2][(yPosition) - 2] == 0){
+      LegalMovesB[LegalMovesCounter][0] = (xPosition) + 2;
+      LegalMovesB[LegalMovesCounter][1] = (yPosition) - 2;
+      LegalMovesB[LegalMovesCounter][2] = 1;
       ++LegalMovesCounter;      
     }
   }
 
-  if(Board[(pawn->xPosition) - 1][(pawn->yPosition) + 1] == 1){
-    if(Board[(pawn->xPosition) - 2][(pawn->yPosition) + 2] == 0){
-      LegalMoves[LegalMovesCounter][0] = (pawn->xPosition) - 2;
-      LegalMoves[LegalMovesCounter][1] = (pawn->yPosition) + 2;
-      LegalMoves[LegalMovesCounter][2] = 1;
+  if(Board[(xPosition) - 1][(yPosition) + 1] == 1){
+    if(Board[(xPosition) - 2][(yPosition) + 2] == 0){
+      LegalMovesB[LegalMovesCounter][0] = (xPosition) - 2;
+      LegalMovesB[LegalMovesCounter][1] = (yPosition) + 2;
+      LegalMovesB[LegalMovesCounter][2] = 1;
       ++LegalMovesCounter;
     }
   }
 
-  if(Board[(pawn->xPosition) + 1][(pawn->yPosition) + 1] == 1){
-    if(Board[(pawn->xPosition) + 2][(pawn->yPosition) + 2] == 0){
-      LegalMoves[LegalMovesCounter][0] = (pawn->xPosition) + 2;
-      LegalMoves[LegalMovesCounter][1] = (pawn->yPosition) + 2;
-      LegalMoves[LegalMovesCounter][2] = 1;
+  if(Board[(xPosition) + 1][(yPosition) + 1] == 1){
+    if(Board[(xPosition) + 2][(yPosition) + 2] == 0){
+      LegalMovesB[LegalMovesCounter][0] = (xPosition) + 2;
+      LegalMovesB[LegalMovesCounter][1] = (yPosition) + 2;
+      LegalMovesB[LegalMovesCounter][2] = 1;
       ++LegalMovesCounter;
     }
   }
+  return LegalMovesB;
+}
 
-   for(int i = 0; i < 4; ++i){
+int BlackLegalityCheck(struct BlackPawn *pawn, struct FieldSelection *select, struct WhitePawn WPtab[], struct BlackPawn BPtab[], int (*Board)[10]){
+  int (*LegalMoves)[3] = FindLegalMoves_Black(pawn->xPosition, pawn->yPosition, Board);
+
+  /*for(int i = 0; i < 4; ++i){
     printf("[%d, %d, %d]", LegalMoves[i][0], LegalMoves[i][1], LegalMoves[i][2]);
   }
-  printf("\n");
+  printf("\n");*/
 
   for(int i = 0; i < 4; ++i){
     if((LegalMoves[i][0] == select->xPosition) && (LegalMoves[i][1] == select->yPosition)){
+      int X = LegalMoves[i][0];
+      int Y = LegalMoves[i][1];
       if(LegalMoves[i][2] == 1){
         for(int i = 0; i < 15; ++i){
-          int averageX = (LegalMoves[i][0] + pawn->xPosition) / 2;
-          int averageY = (LegalMoves[i][1] + pawn->yPosition) / 2;
+          int averageX = 0;
+          int averageY = 0;
+          averageX = (X + pawn->xPosition) / 2;
+          averageY = (Y + pawn->yPosition) / 2;
           if((averageX == WPtab[i].xPosition) && (averageY == WPtab[i].yPosition)){
             if(WhitePawnsCounter > 10){
                WPtab[i].xPosition = -1;
