@@ -112,6 +112,20 @@ int (*FindLegalMoves_White(int xPosition, int yPosition, int (*Board)[10]))[3]{
         ++LegalMovesCounter;
       }
     }
+  int CaptureAvailable = 0;
+  for(int i = 0; i < 4; ++i){
+    if(LegalMovesW[i][2] == 1)
+      CaptureAvailable = 1;
+  }
+  if(CaptureAvailable == 1){
+    for(int i = 0; i < 4; ++i){
+      if(LegalMovesW[i][2] == 0){
+        LegalMovesW[i][0] = -1;
+        LegalMovesW[i][1] = -1;
+      }
+    }
+  }
+
   return LegalMovesW;
 }
 
@@ -168,6 +182,7 @@ int (*FindLegalMoves_Black(int xPosition, int yPosition, int (*Board)[10]))[3]{
   if(Board[(xPosition) - 1][(yPosition) - 1] == 0){
     LegalMovesB[LegalMovesCounter][0] = (xPosition) - 1;
     LegalMovesB[LegalMovesCounter][1] = (yPosition) - 1;
+    LegalMovesB[LegalMovesCounter][2] = 0;
     ++LegalMovesCounter;
   }
   else if(Board[(xPosition) - 1][(yPosition) - 1] == 1){
@@ -182,6 +197,7 @@ int (*FindLegalMoves_Black(int xPosition, int yPosition, int (*Board)[10]))[3]{
   if(Board[(xPosition) + 1][(yPosition) - 1] == 0){
     LegalMovesB[LegalMovesCounter][0] = (xPosition) + 1;
     LegalMovesB[LegalMovesCounter][1] = (yPosition) - 1;
+    LegalMovesB[LegalMovesCounter][2] = 0;
     ++LegalMovesCounter;
   }
   else if(Board[(xPosition) + 1][(yPosition) - 1] == 1){
@@ -210,17 +226,54 @@ int (*FindLegalMoves_Black(int xPosition, int yPosition, int (*Board)[10]))[3]{
       ++LegalMovesCounter;
     }
   }
+
+  int CaptureAvailable = 0;
+  for(int i = 0; i < 4; ++i){
+    if(LegalMovesB[i][2] == 1)
+      CaptureAvailable = 1;
+  }
+  if(CaptureAvailable == 1){
+    for(int i = 0; i < 4; ++i){
+      if(LegalMovesB[i][2] == 0){
+        LegalMovesB[i][0] = -1;
+        LegalMovesB[i][1] = -1;
+
+      }
+    }
+  }
+
   return LegalMovesB;
 }
 
 int BlackLegalityCheck(struct BlackPawn *pawn, struct FieldSelection *select, struct WhitePawn WPtab[], struct BlackPawn BPtab[], int (*Board)[10]){
-  int (*LegalMoves)[3] = FindLegalMoves_Black(pawn->xPosition, pawn->yPosition, Board);
+  
+// <------------
+  int AllLegalMoves[15][4][3];
+  for(int i = 0; i < 15; ++i){
+    int (*LegalMoves)[3] = FindLegalMoves_Black(BPtab[i].xPosition, BPtab[i].yPosition, Board);
+    for(int j = 0; j < 4; ++j){
 
-  /*for(int i = 0; i < 4; ++i){
-    printf("[%d, %d, %d]", LegalMoves[i][0], LegalMoves[i][1], LegalMoves[i][2]);
+      AllLegalMoves[i][j][0] = LegalMoves[j][0];
+      AllLegalMoves[i][j][1] = LegalMoves[j][1];
+      AllLegalMoves[i][j][2] = LegalMoves[j][2];
+    }
   }
-  printf("\n");*/
 
+  for(int i = 0; i < 15; ++i){
+    for(int j = 0; j < 4; ++j){
+      if(AllLegalMoves[i][j][2] == 0){
+        continue;
+      }
+      else{
+        printf("[Nr:%d, x:%d,y:%d, C:%d Aktualne koordy: x:%d,y:%d]\n", i, AllLegalMoves[i][j][0], AllLegalMoves[i][j][1], AllLegalMoves[i][j][2], BPtab[i].xPosition, BPtab[i].yPosition);        
+      }
+
+    }
+  }
+
+  printf("\n");
+// <------------
+  int (*LegalMoves)[3] = FindLegalMoves_Black(pawn->xPosition, pawn->yPosition, Board); // <------------
   for(int i = 0; i < 4; ++i){
     if((LegalMoves[i][0] == select->xPosition) && (LegalMoves[i][1] == select->yPosition)){
       int X = LegalMoves[i][0];
@@ -248,9 +301,10 @@ int BlackLegalityCheck(struct BlackPawn *pawn, struct FieldSelection *select, st
           }
         }      
       }
+
       return 1;
     }
-  }   
+  }  
 
  
 
@@ -261,9 +315,6 @@ int BlackLegalityCheck(struct BlackPawn *pawn, struct FieldSelection *select, st
 
   return 0;
 }
-
-
-
 
 
 void BoardUpdate(int (*Board)[10], struct WhitePawn WPtab[], struct BlackPawn BPtab[]){
